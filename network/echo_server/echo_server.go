@@ -7,7 +7,7 @@ import (
 )
 
 
-func echo(conn net.Con) {
+func echo(conn net.Conn) {
 	defer conn.Close()
 
 	b := make([]byte, 512)
