@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/google/gopacket"
@@ -56,6 +57,17 @@ func capture(iface, target string) {
 	}
 }
 
+func explode(portString string) ([]string, error) {
+	ret := make([]string, 0)
+
+	ports := strings.Split(portString, ",")
+	for _, port := range ports {
+		port := strings.TrimSpace(port)
+		ret = append(ret, port)
+	}
+	return ret, nil
+}
+
 func main() {
 	if len(os.Args) != 4 {
 		log.Fatalln("Usage: main.go <capture_iface> <target_ip> <port1,port2,port3>")
@@ -82,7 +94,10 @@ func main() {
 	go capture(iface, ip)
 	time.Sleep(1 * time.Second)
 
-	ports := os.Args[3]
+	ports, err := explode(os.Args[3])
+	if err != nil {
+		log.Panicln(err)
+	}
 
 	for _, port := range ports {
 		target := fmt.Sprintf("%s:%s", ip, string(port))
