@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"text/tabwriter"
 
 	"github.com/miekg/dns"
 )
@@ -133,7 +134,7 @@ func main() {
 
 	go func() {
 		for r := range gather {
-			results = append(results, r)
+			results = append(results, r...)
 		}
 
 		var e empty
@@ -149,9 +150,9 @@ func main() {
 	close(gather)
 	<-tracker
 
-	w := tabwriter.NewWriter(os.Stdout, 0, ' ', ' ', 0)
+	w := tabwriter.NewWriter(os.Stdout, 0, 8, 4, ' ', 0)
 	for _, r := range results {
-		fmt.Fprint(w, "%s\"%s\n", r.Hostname, r.IPAddress)
+		fmt.Fprintf(w, "%s\t%s\n", r.Hostname, r.IPAddress)
 	}
 
 	w.Flush()
